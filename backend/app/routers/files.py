@@ -12,7 +12,6 @@ import shutil
 from fastapi.responses import JSONResponse
 from ..config import FILENAME_REGEX, TEMP_DIR, logger
 
-
 router = APIRouter()
 
 # Regular expression pattern for validating filenames
@@ -61,7 +60,8 @@ def list_files(db: Session = Depends(get_db)):
     """
     try:
         files = db.query(File).all()
-        logger.info(f"Listing all markdown files: {[file.filename for file in files]}")
+        logger.info(f"Listing all markdown files: {
+                    [file.filename for file in files]}")
         return files
     except Exception as e:
         logger.error(f"Error fetching files: {e}")
@@ -117,21 +117,25 @@ def rename_file(
     new_filename_str = rename_request.new_filename
     if not new_filename_str:
         logger.warning("New filename was not provided.")
-        raise HTTPException(status_code=400, detail="New filename is required.")
+        raise HTTPException(
+            status_code=400, detail="New filename is required.")
 
     # Check for unauthorized special characters
     forbidden_chars = [')', '#', '?', '&', '/', '*', '<', '>', '|', '\\']
     if any(char in new_filename_str for char in forbidden_chars):
-        logger.warning(f"Unauthorized special characters in the filename: {new_filename_str}")
+        logger.warning(f"Unauthorized special characters in the filename: {
+                       new_filename_str}")
         raise HTTPException(
             status_code=400,
             detail="The filename must not contain special characters such as ), #, ?, &, /."
         )
 
-    logger.info(f"Attempting to rename file from {filename} to {new_filename_str}")
+    logger.info(f"Attempting to rename file from {
+                filename} to {new_filename_str}")
 
     # Check if the new filename already exists
-    existing_file = db.query(File).filter(File.filename == new_filename_str).first()
+    existing_file = db.query(File).filter(
+        File.filename == new_filename_str).first()
     if existing_file:
         logger.warning(f"File with name {new_filename_str} already exists.")
         raise HTTPException(status_code=400, detail="File name already taken.")
@@ -153,7 +157,8 @@ def rename_file(
 
     # Log created_at and updated_at
     print(f"created_at: {file.created_at}, updated_at: {file.updated_at}")
-    logger.info(f"created_at: {file.created_at}, updated_at: {file.updated_at}")
+    logger.info(f"created_at: {file.created_at}, updated_at: {
+                file.updated_at}")
 
     return file
 
@@ -189,8 +194,10 @@ def delete_file(filename: str = FastAPIPath(..., regex=FILENAME_REGEX), db: Sess
 
     db.delete(file)
     db.commit()
-    logger.info(f"Deleted file {filename} and its associated paragraphs and notes from DB.")
-    print(f"Deleted file {filename} and its associated paragraphs and notes from DB.")
+    logger.info(f"Deleted file {
+                filename} and its associated paragraphs and notes from DB.")
+    print(f"Deleted file {
+          filename} and its associated paragraphs and notes from DB.")
     return {"detail": "File and associated paragraphs and notes deleted successfully."}
 
 
@@ -209,29 +216,36 @@ async def upload_files(files: List[UploadFile], db: Session = Depends(get_db)):
     Raises:
         HTTPException: If no files are received or processed successfully.
     """
+
     if not files:
         logger.warning("No files received for upload.")
-        raise HTTPException(status_code=400, detail="No files received for upload.")
+        raise HTTPException(
+            status_code=400, detail="No files received for upload.")
 
     processed_files = []
 
     for uploaded_file in files:
         try:
             # Check for unauthorized special characters in filename
-            forbidden_chars = [')', '#', '?', '&', '/', '*', '<', '>', '|', '\\']
+            forbidden_chars = [')', '#', '?', '&',
+                               '/', '*', '<', '>', '|', '\\']
             if any(char in uploaded_file.filename for char in forbidden_chars):
-                logger.warning(f"Unauthorized special characters in the filename: {uploaded_file.filename}")
+                logger.warning(f"Unauthorized special characters in the filename: {
+                               uploaded_file.filename}")
                 raise HTTPException(
                     status_code=400,
-                    detail=f"The filename '{uploaded_file.filename}' must not contain special characters such as ), #, ?, &, /."
+                    detail=f"The filename '{
+                        uploaded_file.filename}' must not contain special characters such as ), #, ?, &, /."
                 )
 
             # Validate file extension
             allowed_extensions = {"pdf", "docx"}
             file_extension = uploaded_file.filename.split('.')[-1].lower()
             if file_extension not in allowed_extensions:
-                logger.warning(f"Unsupported file type: {uploaded_file.filename}")
-                raise HTTPException(status_code=400, detail=f"Unsupported file type: {uploaded_file.filename}")
+                logger.warning(f"Unsupported file type: {
+                               uploaded_file.filename}")
+                raise HTTPException(status_code=400, detail=f"Unsupported file type: {
+                                    uploaded_file.filename}")
 
             # Temporarily save the uploaded file
             temp_file_path = TEMP_DIR / uploaded_file.filename
@@ -251,7 +265,8 @@ async def upload_files(files: List[UploadFile], db: Session = Depends(get_db)):
             # Process the file with llama_parse
             parse_result = await parse_to_markdown(str(temp_file_path), db, new_file.id, new_file.filename)
             if parse_result is None:
-                logger.warning(f"No documents in file {uploaded_file.filename} found.")
+                logger.warning(f"No documents in file {
+                               uploaded_file.filename} found.")
                 db.delete(new_file)
                 db.commit()
                 continue  # Skip if no documents are found
@@ -273,14 +288,18 @@ async def upload_files(files: List[UploadFile], db: Session = Depends(get_db)):
             logger.info(f"Temporary file {uploaded_file.filename} deleted.")
 
         except HTTPException as he:
-            logger.error(f"HTTP error while processing the file {uploaded_file.filename}: {he.detail}")
+            logger.error(f"HTTP error while processing the file {
+                         uploaded_file.filename}: {he.detail}")
             raise he
         except Exception as e:
-            logger.error(f"Error processing the file {uploaded_file.filename}: {e}")
-            raise HTTPException(status_code=500, detail=f"Error processing the file {uploaded_file.filename}.")
+            logger.error(f"Error processing the file {
+                         uploaded_file.filename}: {e}")
+            raise HTTPException(status_code=500, detail=f"Error processing the file {
+                                uploaded_file.filename}.")
 
     if not processed_files:
         logger.warning("No files processed successfully.")
-        raise HTTPException(status_code=400, detail="No files processed successfully.")
+        raise HTTPException(
+            status_code=400, detail="No files processed successfully.")
 
     return processed_files

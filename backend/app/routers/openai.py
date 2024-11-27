@@ -9,6 +9,8 @@ from ..config import logger  # Importiere die Variablen
 
 router = APIRouter()
 # Dependency Injection für den OpenAIService
+
+
 def get_openai_service():
     return OpenAIService()
 
@@ -38,4 +40,5 @@ def ask_openai_feedback(query: QueryRequest, openai_service: OpenAIService = Dep
         return QueryResponse(feedback=feedback)
     except Exception as e:
         logger.error(f"Error in the request to OpenAI: {e}")
-        raise HTTPException(status_code=500, detail="Error in the request to OpenAI.")
+        raise HTTPException(
+            status_code=500, detail="Error in the request to OpenAI.")

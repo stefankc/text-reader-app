@@ -22,7 +22,7 @@ app = FastAPI()
 # CORS Configuration
 origins = [
     "http://localhost:3000",  # Development frontend
-    #"http://localhost:8000",  # Production frontend
+    # "http://localhost:8000",  # Production frontend
     "*"  # Temporarily allow all origins while debugging
 ]
 
@@ -46,7 +46,7 @@ app.include_router(openai.router, prefix="/openai", tags=["openai"])
 def read_root():
     """
     Root endpoint returning a message.
-    
+
     Returns:
         dict: A message indicating the service.
     """

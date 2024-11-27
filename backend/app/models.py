@@ -11,6 +11,7 @@ from sqlalchemy.orm import relationship
 from datetime import datetime
 from .database import Base
 
+
 class File(Base):
     """
     Represents a file in the system.
@@ -28,11 +29,14 @@ class File(Base):
     id = Column(Integer, primary_key=True, index=True)
     filename = Column(String, unique=True, index=True, nullable=False)
     content = Column(String, nullable=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now(), nullable=False)
-    
+    created_at = Column(DateTime(timezone=True),
+                        server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now(
+    ), server_default=func.now(), nullable=False)
+
     # Beziehungen zu Paragraph und anderen Modellen
     paragraphs = relationship("Paragraph", back_populates="file")
+
 
 class Paragraph(Base):
     """
@@ -53,12 +57,15 @@ class Paragraph(Base):
     file_id = Column(Integer, ForeignKey('files.id'), nullable=False)
     order = Column(Integer, nullable=False)
     content = Column(String, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now(), nullable=False)
-    
+    created_at = Column(DateTime(timezone=True),
+                        server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now(
+    ), server_default=func.now(), nullable=False)
+
     # Beziehungen zu Note
     notes = relationship("Note", back_populates="paragraph")
     file = relationship("File", back_populates="paragraphs")
+
 
 class Note(Base):
     """
@@ -77,11 +84,14 @@ class Note(Base):
     id = Column(Integer, primary_key=True, index=True)
     paragraph_id = Column(Integer, ForeignKey('paragraphs.id'), nullable=False)
     content = Column(String, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now(), nullable=False)
-    
+    created_at = Column(DateTime(timezone=True),
+                        server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now(
+    ), server_default=func.now(), nullable=False)
+
     # Beziehungen zu Paragraph
     paragraph = relationship("Paragraph", back_populates="notes")
+
 
 class APIKey(Base):
     """
@@ -93,7 +103,8 @@ class APIKey(Base):
         key (str): The API key value
     """
     __tablename__ = "api_keys"
-    
+
     id = Column(Integer, primary_key=True, index=True)
-    service = Column(String, unique=True, index=True)  # z.B. 'openai', 'llama_cloud'
+    # z.B. 'openai', 'llama_cloud'
+    service = Column(String, unique=True, index=True)
     key = Column(String, nullable=False)

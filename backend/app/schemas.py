@@ -11,9 +11,11 @@ class RenameRequest(BaseModel):
     class Config:
         from_attributes = True
 
+
 class ParagraphBase(BaseModel):
     order: int
     content: str
+
 
 class ParagraphRead(ParagraphBase):
     id: int
@@ -24,11 +26,14 @@ class ParagraphRead(ParagraphBase):
     class Config:
         from_attributes = True
 
+
 class NoteBase(BaseModel):
     content: str
 
+
 class NoteCreate(NoteBase):
     pass
+
 
 class NoteRead(NoteBase):
     id: int
@@ -40,11 +45,14 @@ class NoteRead(NoteBase):
     class Config:
         from_attributes = True  # Anstelle von orm_mode = True
 
+
 class FileBase(BaseModel):
     filename: str
 
+
 class FileCreate(FileBase):
     content: str
+
 
 class FileRead(FileBase):
     id: int
@@ -56,11 +64,12 @@ class FileRead(FileBase):
     class Config:
         from_attributes = True  # Anstelle von orm_mode = True
 
+
 class QueryRequest(BaseModel):
     paragraph_id: int
     context: str
     note_content: str  # Notizinhalt
-    
+
 
 class QueryResponse(BaseModel):
     feedback: str  # Korrekt auf 'feedback' gesetzt

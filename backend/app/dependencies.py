@@ -3,9 +3,11 @@ from functools import lru_cache
 from .database import SessionLocal
 from .config import Settings
 
+
 @lru_cache()
 def get_settings():
     return Settings()
+
 
 def get_db():
     """

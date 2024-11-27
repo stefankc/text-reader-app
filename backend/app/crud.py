@@ -15,6 +15,7 @@ import logging
 # Define the path to the configuration file
 CONFIG_FILE = Path(__file__).parent / "config.json"
 
+
 def read_api_keys() -> Optional[APIKeys]:
     """
     Read API keys from the configuration file.
@@ -33,6 +34,7 @@ def read_api_keys() -> Optional[APIKeys]:
         except json.JSONDecodeError as e:
             logging.error(f"Error decoding JSON from {CONFIG_FILE}: {e}")
             return None
+
 
 def write_api_keys(api_keys: APIKeys) -> None:
     """
